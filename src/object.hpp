@@ -250,6 +250,9 @@ struct type_name : public std::variant<
 
     [[nodiscard]] auto add_ptr() const -> type_name;
     [[nodiscard]] auto remove_ptr() const -> type_name;
+
+    [[nodiscard]] auto add_optional() const -> type_name;
+    [[nodiscard]] auto remove_optional() const -> type_name;
  
     [[nodiscard]] auto add_const() const -> type_name;
     [[nodiscard]] auto remove_const() const -> type_name;

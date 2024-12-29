@@ -1642,6 +1642,18 @@ auto push_expr(compiler& com, compile_type ct, const node_intrinsic_expr& node) 
         push_value(code(com), op::read_file);
         return { char_span };
     }
+
+    // For optionals, returns the bool that says if the optional has a value or not.
+    if (node.name == "has_value") {
+        node.token.assert_eq(node.args.size(), 1, "@has_value only accepts one argument");
+        const auto type = push_expr(com, compile_type::ptr, *node.args[0]).type;
+        node.token.assert(type.is<type_optional>(), "@has_value only operates on optionals");
+        const auto inner = *type.as<type_optional>().inner_type;
+        push_value(code(com), op::push_u64, com.types.size_of(inner), op::u64_add);
+        push_value(code(com), op::load, std::uint64_t{1}); // load the bool
+        return { type_bool{} };
+    }
+
     node.token.error("no intrisic function named @{} exists", node.name);
 }
 
@@ -1843,8 +1855,12 @@ void push_stmt(compiler& com, const node_if_stmt& node)
     const auto program_size = code(com).size();
 
     const auto [cond_type, cond_value] = push_expr(com, compile_type::val, *node.condition);
-    node.token.assert_eq(cond_type, type_name{type_bool{}}, "if-stmt invalid condition");
+
+    // TODO: If the condition to an if statement is an optional, auto narrow the type and enter
+    if (cond_type.is<type_optional>()) {
+    }
     
+    node.token.assert_eq(cond_type, type_name{type_bool{}}, "if-stmt invalid condition");
     if (cond_value.is<bool>()) {
         code(com).resize(program_size); // Remove the code to push the value at runtime
         if (cond_value.as<bool>()) {

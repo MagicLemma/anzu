@@ -25,6 +25,17 @@ auto type_name::remove_ptr() const -> type_name
     return *as<type_ptr>().inner_type;
 }
 
+auto type_name::add_optional() const -> type_name
+{
+    return { type_optional{ .inner_type{*this} } };
+}
+
+auto type_name::remove_optional() const -> type_name
+{
+    if (!is<type_optional>()) panic("tried to remove_optional on a non-optional type\n");
+    return *as<type_optional>().inner_type;
+}
+
 auto type_name::add_const() const -> type_name
 {
     auto copy = *this;
