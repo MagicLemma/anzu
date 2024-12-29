@@ -1,2 +1,2 @@
-
-let x : i64? = null;
+let x := 10;
+var o : i64? = x;

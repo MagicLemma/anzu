@@ -285,7 +285,7 @@ void push_copy_typechecked(compiler& com, const node_expr& expr, const type_name
         return;
     }
 
-    // null can convert to a null ptr and null span and an empty optional
+    // null can convert to a null ptr, null span and an empty optional
     if (expected.is<type_ptr>() && actual.is<type_null>()) {
         push_value(code(com), op::push_u64, std::size_t{0}); // push a nullptr
         return;
@@ -306,6 +306,12 @@ void push_copy_typechecked(compiler& com, const node_expr& expr, const type_name
     // Let functions convert to function ptrs
     if (auto func = actual.get_if<type_function>(); func && func->to_pointer() == expected) {
         push_value(code(com), op::push_function_ptr, func->id); // push the id
+        return;
+    }
+
+    // Let T convert to T?
+    if (expected.is<type_optional>() && *expected.as<type_optional>().inner_type == actual) {
+        push_value(code(com), op::push_bool, true); // the optional is engaged
         return;
     }
 
