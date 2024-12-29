@@ -54,9 +54,6 @@ auto print_op(std::string_view rom, const std::byte* start, const std::byte* ptr
         case op::push_null: {
             std::print("PUSH_NULL\n");
         } break;
-        case op::push_nullptr: {
-            std::print("PUSH_NULLPTR\n");
-        } break;
         case op::push_string_literal: {
             const auto index = read_at<std::uint64_t>(&ptr);
             const auto size = read_at<std::uint64_t>(&ptr);

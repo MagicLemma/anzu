@@ -32,7 +32,6 @@ enum class op : std::uint8_t
     push_char,
     push_bool,
     push_null,
-    push_nullptr,
 
     push_string_literal,
     push_ptr_global,

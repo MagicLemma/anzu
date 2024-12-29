@@ -285,7 +285,7 @@ void push_copy_typechecked(compiler& com, const node_expr& expr, const type_name
         return;
     }
 
-    // null can convert to a null ptr and null span
+    // null can convert to a null ptr and null span and an empty optional
     if (expected.is<type_ptr>() && actual.is<type_null>()) {
         push_value(code(com), op::push_u64, std::size_t{0}); // push a nullptr
         return;
@@ -293,6 +293,11 @@ void push_copy_typechecked(compiler& com, const node_expr& expr, const type_name
     if (expected.is<type_span>() && actual.is<type_null>()) {
         push_value(code(com), op::push_u64, std::size_t{0}); // push a nullptr
         push_value(code(com), op::push_u64, std::size_t{0}); // push the size
+        return;
+    }
+    if (expected.is<type_optional>() && actual.is<type_null>()) {
+        // push an empty object, the last byte is the bool which says its empty
+        push_value(code(com), op::push, com.types.size_of(expected));
         return;
     }
 

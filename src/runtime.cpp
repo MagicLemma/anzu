@@ -83,9 +83,6 @@ auto execute_program(bytecode_context& ctx) -> void
             case op::push_null: {
                 ctx.stack.push(std::byte{0});
             } break;
-            case op::push_nullptr: {
-                ctx.stack.push(std::uint64_t{0});
-            } break;
             case op::push_ptr_global: {
                 const auto offset = read_advance<std::uint64_t>(ctx);
                 std::byte* ptr = &ctx.stack.at(offset);
