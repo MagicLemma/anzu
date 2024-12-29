@@ -131,6 +131,15 @@ struct type_span
     auto operator==(const type_span&) const -> bool = default;
 };
 
+struct type_optional
+{
+    value_ptr<type_name> inner_type;
+
+    auto to_hash() const { return hash(inner_type); }
+    auto to_string() const -> std::string;
+    auto operator==(const type_optional&) const -> bool = default;
+};
+
 struct type_function_ptr
 {
     std::vector<type_name> param_types;
@@ -223,6 +232,7 @@ struct type_name : public std::variant<
     type_struct,
     type_ptr,
     type_span,
+    type_optional,
 
     type_function_ptr,
     type_bound_method,

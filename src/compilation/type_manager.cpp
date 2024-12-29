@@ -78,6 +78,9 @@ auto type_manager::size_of(const type_name& type) const -> std::size_t
         [](const type_span&) {
             return sizeof(std::byte*) + sizeof(std::size_t);
         },
+        [&](const type_optional& t) {
+            return size_of(*t.inner_type) + 1;
+        },
         [](const type_function_ptr&) {
             return sizeof(std::byte*);
         },

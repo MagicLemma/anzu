@@ -122,6 +122,11 @@ auto type_span::to_string() const -> std::string
     return std::format("{}[]", to_string_paren(*inner_type));
 }
 
+auto type_optional::to_string() const -> std::string
+{
+    return std::format("{}?", to_string_paren(*inner_type));
+}
+
 auto type_function_ptr::to_string() const -> std::string
 {
     return std::format(
