@@ -1,4 +1,1 @@
-var o : i64? = 10;
-o = null;
-let x := @has_value(o);
-print("{}\n", x);
+let n : null? = null;

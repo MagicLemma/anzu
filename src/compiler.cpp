@@ -1213,6 +1213,7 @@ auto push_expr(compiler& com, compile_type ct, const node_const_expr& node) -> e
 auto push_expr(compiler& com, compile_type ct, const node_optional_expr& node) -> expr_result
 {
     const auto [type, value] = type_of_expr(com, *node.expr);
+    node.token.assert(!type.is<type_null>(), "optional nulls not allowed, perhaps you want a bool?"); 
     node.token.assert(type.is<type_type>(), "only types can be suffixied with '?'");
     const auto typeval = get_type_value(node.token, {type, value});
     return { type, {type_optional{typeval}} };
