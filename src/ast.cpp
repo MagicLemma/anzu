@@ -146,6 +146,10 @@ auto print_node(const node_expr& root, int indent) -> void
             std::print("{}Const:\n", spaces);
             print_node(*node.expr, indent + 1);
         },
+        [&](const node_optional_expr& node) {
+            std::print("{}Optional:\n", spaces);
+            print_node(*node.expr, indent + 1);
+        },
         [&](const node_new_expr& node) {
             std::print("{}New:\n", spaces);
             std::print("{}- Arena:\n", spaces);
@@ -158,15 +162,6 @@ auto print_node(const node_expr& root, int indent) -> void
             }
             std::print("{}- Expr:\n", spaces);
             print_node(*node.expr, indent + 1);
-        },
-        [&](const node_ternary_expr& node) {
-            std::print("{}Ternary:\n", spaces);
-            std::print("{}- Condition:\n", spaces);
-            print_node(*node.condition, indent + 1);
-            std::print("{}- TrueCase:\n", spaces);
-            print_node(*node.true_case, indent + 1);
-            std::print("{}- FalseCase:\n", spaces);
-            print_node(*node.false_case, indent + 1);
         },
         [&](const node_intrinsic_expr& node) {
             std::print("{}Intrinsic:\n", spaces);

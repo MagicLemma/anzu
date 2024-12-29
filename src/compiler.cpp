@@ -1199,6 +1199,14 @@ auto push_expr(compiler& com, compile_type ct, const node_const_expr& node) -> e
     return { t.add_const(), v };
 }
 
+auto push_expr(compiler& com, compile_type ct, const node_optional_expr& node) -> expr_result
+{
+    const auto [type, value] = type_of_expr(com, *node.expr);
+    node.token.assert(type.is<type_type>(), "only types can be suffixied with '?'");
+    const auto typeval = get_type_value(node.token, {type, value});
+    return { type, {type_optional{typeval}} };
+}
+
 auto push_expr(compiler& com, compile_type ct, const node_new_expr& node) -> expr_result
 {
     node.token.assert(ct == compile_type::val, "cannot take the address of a new expression");
@@ -1477,28 +1485,6 @@ auto push_expr(compiler& com, compile_type ct, const node_subscript_expr& node) 
         return { inner.add_const() }; // propagate const to elements
     }
     return { inner };
-}
-
-auto push_expr(compiler& com, compile_type ct, const node_ternary_expr& node) -> expr_result
-{
-    node.token.assert(ct == compile_type::val, "cannot take the address of a ternary expression");
-
-    const auto type = type_of_expr(com, *node.true_case).type;
-    node.token.assert_eq(type_of_expr(com, *node.false_case).type, type, "mismatched types in ternary");
-
-    const auto cond_type = push_expr(com, compile_type::val, *node.condition).type;
-    node.token.assert_eq(cond_type, type_name{type_bool{}}, "if-stmt invalid condition");
-
-    push_value(code(com), op::jump_if_false);
-    const auto jump_pos = push_value(code(com), std::uint64_t{0});
-    push_expr(com, ct, *node.true_case);
-    push_value(code(com), op::jump);
-    const auto else_pos = push_value(code(com), std::uint64_t{0});
-    const auto in_else_pos = code(com).size();
-    push_expr(com, ct, *node.false_case);
-    write_value(code(com), jump_pos, in_else_pos); // Jump into the else block if false
-    write_value(code(com), else_pos, code(com).size()); // Jump past the end if false
-    return { type };
 }
 
 auto push_expr(compiler& com, compile_type ct, const node_intrinsic_expr& node) -> expr_result
