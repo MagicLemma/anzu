@@ -1214,9 +1214,19 @@ auto push_expr(compiler& com, compile_type ct, const node_optional_expr& node) -
 {
     const auto [type, value] = type_of_expr(com, *node.expr);
     node.token.assert(!type.is<type_null>(), "optional nulls not allowed, perhaps you want a bool?"); 
-    node.token.assert(type.is<type_type>(), "only types can be suffixied with '?'");
-    const auto typeval = get_type_value(node.token, {type, value});
-    return { type, {type_optional{typeval}} };
+    
+    // optional type declaration
+    if (type.is<type_type>()) {
+        const auto typeval = get_type_value(node.token, {type, value});
+        return { type, {type_optional{typeval}} };
+    }
+
+    // otherwise, we are accessing the optional as the inner type (TODO: make safe)
+    const auto ret = push_expr(com, ct, *node.expr);
+    if (ct == compile_type::val) {
+        push_value(code(com), op::pop, std::uint64_t{1}); // pop the bool if we're loading the val
+    }
+    return { ret.type.remove_optional() };
 }
 
 auto push_expr(compiler& com, compile_type ct, const node_new_expr& node) -> expr_result
@@ -1856,10 +1866,6 @@ void push_stmt(compiler& com, const node_if_stmt& node)
     const auto program_size = code(com).size();
 
     const auto [cond_type, cond_value] = push_expr(com, compile_type::val, *node.condition);
-
-    // TODO: If the condition to an if statement is an optional, auto narrow the type and enter
-    if (cond_type.is<type_optional>()) {
-    }
     
     node.token.assert_eq(cond_type, type_name{type_bool{}}, "if-stmt invalid condition");
     if (cond_value.is<bool>()) {

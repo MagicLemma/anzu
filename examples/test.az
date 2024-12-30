@@ -1,1 +1,6 @@
-let n : null? = null;
+
+let x : i64? = null;
+
+if ! @has_value(x) {
+    print("{}\n", x?);
+}
