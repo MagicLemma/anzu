@@ -1,6 +1,7 @@
 
-let x : i64? = null;
+let x : i64? = 76;
+x? = 10;
 
-if ! @has_value(x) {
+if @has_value(x) {
     print("{}\n", x?);
 }

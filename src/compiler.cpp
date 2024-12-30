@@ -1226,7 +1226,13 @@ auto push_expr(compiler& com, compile_type ct, const node_optional_expr& node) -
     if (ct == compile_type::val) {
         push_value(code(com), op::pop, std::uint64_t{1}); // pop the bool if we're loading the val
     }
-    return { ret.type.remove_optional() };
+
+    // propagate const
+    if (ret.type.is_const) {
+        return { ret.type.remove_optional().add_const() };
+    } else {
+        return { ret.type.remove_optional() };
+    }
 }
 
 auto push_expr(compiler& com, compile_type ct, const node_new_expr& node) -> expr_result
